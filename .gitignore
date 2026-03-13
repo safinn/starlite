@@ -1,0 +1,26 @@
+# Test binary, built with `go test -c`
+*.test
+.task/
+
+# Output of tools
+*.out
+.mise/
+
+# Build artifacts
+tmp/
+bin/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+
+# Env files
+.env
+
+# Database files
+/data/

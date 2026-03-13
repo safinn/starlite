@@ -1,0 +1,9 @@
+package components
+
+templ Icon(iconName string, size ...string) {
+	if len(size) > 0 && size[0] != "" {
+		<span class="icon" style={ "--icon: var(--" + iconName + "); --icon-size: " + size[0] + ";" }></span>
+	} else {
+		<span class="icon" style={ "--icon: var(--" + iconName + ");" }></span>
+	}
+}

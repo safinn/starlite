@@ -1,0 +1,37 @@
+package pages
+
+import (
+	"starlite/internal/features/common/components"
+	"starlite/internal/features/common/layouts"
+)
+
+templ Index(counts map[string]int) {
+	@layouts.Base("Starlite", layouts.JS("js/datastar.js"), layouts.CSS("css/index.css")) {
+		<header>
+			<div>
+				@components.Icon("rocket", "2em")
+			</div>
+			<h1>Starlite</h1>
+			<p>Boilerplate for creating real-time Hypermedia applications in Go</p>
+			@components.ThemeSwitcher()
+		</header>
+		<main>
+			<section>
+				<div data-init="@get('/react')" data-signals={ templ.JSONString(counts) } class="reaction-container">
+					<div class="reaction-block">
+						<button class="reaction-type" data-on:click="@post('/react', { payload: { 'reaction': 'like' } })">👍</button>
+						<span class="reaction-count" data-text="$like ? $like : 0">{ counts["like"] }</span>
+					</div>
+					<div class="reaction-block">
+						<button class="reaction-type" data-on:click="@post('/react', { payload: { 'reaction': 'love' } })">❤️</button>
+						<span class="reaction-count" data-text="$love ? $love : 0">{ counts["love"] }</span>
+					</div>
+					<div class="reaction-block">
+						<button class="reaction-type" data-on:click="@post('/react', { payload: { 'reaction': 'laugh' } })">😂</button>
+						<span class="reaction-count" data-text="$laugh ? $laugh : 0">{ counts["laugh"] }</span>
+					</div>
+				</div>
+			</section>
+		</main>
+	}
+}

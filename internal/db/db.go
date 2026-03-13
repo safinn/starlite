@@ -1,0 +1,67 @@
+package db
+
+import (
+	"context"
+	"embed"
+	"fmt"
+	"io"
+	"io/fs"
+	"log"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+
+	toolbeltdb "github.com/delaneyj/toolbelt/db"
+)
+
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
+
+func SetupDB(ctx context.Context, dataFolder string, shouldClear bool) (*toolbeltdb.Database, error) {
+	migrationsDir := "migrations"
+	migrationsFiles, err := migrationsFS.ReadDir(migrationsDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read migrations directory: %w", err)
+	}
+	slices.SortFunc(migrationsFiles, func(a, b fs.DirEntry) int {
+		return strings.Compare(a.Name(), b.Name())
+	})
+
+	migrations := make([]string, len(migrationsFiles))
+	for i, file := range migrationsFiles {
+		fn := filepath.Join(migrationsDir, file.Name())
+		fnts := filepath.ToSlash(fn)
+		f, err := migrationsFS.Open(fnts)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open migration file: %w", err)
+		}
+		defer f.Close()
+
+		content, err := io.ReadAll(f)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read migration file: %w", err)
+		}
+
+		migrations[i] = string(content)
+	}
+
+	dbFolder := filepath.Join(dataFolder, "data/sqlite")
+	if shouldClear {
+		log.Printf("Clearing database folder: %s", dbFolder)
+		if err := os.RemoveAll(dbFolder); err != nil {
+			return nil, fmt.Errorf("failed to remove database folder: %w", err)
+		}
+	}
+	dbFilename := filepath.Join(dbFolder, "db.sqlite")
+	db, err := toolbeltdb.NewDatabase(
+		ctx,
+		toolbeltdb.DatabaseWithFilename(dbFilename),
+		toolbeltdb.DatabaseWithMigrations(migrations),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create database: %w", err)
+	}
+
+	return db, nil
+}

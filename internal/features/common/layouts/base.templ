@@ -1,0 +1,47 @@
+package layouts
+
+import (
+	"starlite/internal/config"
+	"starlite/internal/static"
+)
+
+templ Base(title string, assetOptions ...AssetOptions) {
+	<!DOCTYPE html>
+	<html
+		lang="en"
+		data-signals="{ theme: localStorage.getItem('theme') || 'system' }"
+		data-attr:class="$theme !== 'system' ? $theme : ''"
+	>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<meta name="description" content="Starting stack for go + datastar + templ + sqlite + sqlc project."/>
+			<script>
+        !function(){try{
+          var d=document.documentElement,
+					t=localStorage.getItem("theme");
+
+					d.classList.remove("light", "dark");
+					if(t!=='system') {
+						d.classList.add(t);
+					}
+        }catch(e){}}();
+      </script>
+			<link rel="icon" type="image/x-icon" href={ static.StaticPath("assets/favicon.ico") }/>
+			<link rel="stylesheet" href={ static.StaticPath("css/global.css") }/>
+			for _, cssFile := range buildAssetOptions(assetOptions...).CSS {
+				<link rel="stylesheet" href={ static.StaticPath(cssFile) }/>
+			}
+			for _, jsFile := range buildAssetOptions(assetOptions...).JS {
+				<script type="module" src={ static.StaticPath(jsFile) }></script>
+			}
+		</head>
+		<body>
+			if config.Global.Env == config.Dev {
+				<div data-init="@get('/reload', {retryMaxCount: 1000, retryInterval:20, retryMaxWaitMs:200})"></div>
+			}
+			{ children... }
+		</body>
+	</html>
+}
