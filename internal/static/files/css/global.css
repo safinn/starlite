@@ -6,7 +6,7 @@
   --border: var(--color-mist-300);
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: ui-monospace, SF Mono, SF Mono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
 
@@ -461,8 +461,7 @@
   --grid-page-width: var(--width-xl);
   --grid-page-gutter: 5vw;
   --grid-page-main: 2 / 3;
-  --grid-page: minmax(var(--grid-page-gutter), 1fr)
-    minmax(0, var(--grid-page-width)) minmax(var(--grid-page-gutter), 1fr);
+  --grid-page: minmax(var(--grid-page-gutter), 1fr) minmax(0, var(--grid-page-width)) minmax(var(--grid-page-gutter), 1fr);
 }
 
 
@@ -483,6 +482,7 @@ html.dark {
 
 /* System theme uses media query setting same variables as dark theme */
 @media (prefers-color-scheme: dark) {
+
   html:not([class]),
   html[class=""] {
     --background: var(--color-mist-950);
@@ -495,62 +495,94 @@ html.dark {
   }
 }
 
-/* http://meyerweb.com/eric/tools/css/reset/
-   v2.0 | 20110126
-   License: none (public domain)
+/* reset
+   https://www.joshwcomeau.com/css/custom-css-reset/
 */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
-  font-family: var(--font-sans);
+/* 1. Use a more-intuitive box-sizing model */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-	display: block;
+
+/* 2. Remove default margin */
+*:not(dialog) {
+  margin: 0;
 }
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
 body {
-	line-height: 1;
+  /* 4. Increase line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
 }
-ol, ul {
-	list-style: none;
+
+/* 6. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
 }
-blockquote, q {
-	quotes: none;
+
+/* 7. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+  font: inherit;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
+
+/* 8. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
 }
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root,
+#__next {
+  isolation: isolate;
 }
 
 /* reset end */
 
-html, body {
+html,
+body {
   color: var(--foreground);
   background-color: var(--background);
+  font-family: var(--font-sans);
 }
 
 .icon {

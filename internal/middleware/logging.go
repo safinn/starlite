@@ -1,94 +1,61 @@
-// Package middleware provides HTTP middleware components for request processing.
 package middleware
 
 import (
+	"crypto/rand"
+	"fmt"
 	"log/slog"
 	"net/http"
-	"starlite/pkg/logctx"
 	"time"
+
+	"starlite/pkg/logger"
+
+	"github.com/felixge/httpsnoop"
 )
 
-// responseWriter wraps http.ResponseWriter to capture the status code
-type responseWriter struct {
-	http.ResponseWriter
-	statusCode int
-	written    bool
+func nextRequestID() string {
+	var b [16]byte
+	rand.Read(b[:])
+	return fmt.Sprintf("%x", b[:])
 }
 
-// Flush implements the http.Flusher interface to support SSE
-func (rw *responseWriter) Flush() {
-	if flusher, ok := rw.ResponseWriter.(http.Flusher); ok {
-		flusher.Flush()
-	}
-}
-
-func (rw *responseWriter) WriteHeader(statusCode int) {
-	if !rw.written {
-		rw.statusCode = statusCode
-		rw.written = true
-		rw.ResponseWriter.WriteHeader(statusCode)
-	}
-}
-
-func (rw *responseWriter) Write(b []byte) (int, error) {
-	if !rw.written {
-		rw.statusCode = http.StatusOK
-		rw.written = true
-		// We don't call rw.ResponseWriter.WriteHeader(http.StatusOK) here
-		// because Write() automatically sends a 200 OK if WriteHeader hasn't been called.
-	}
-	return rw.ResponseWriter.Write(b)
-}
-
-// newResponseWriter creates a new responseWriter
-func newResponseWriter(w http.ResponseWriter) *responseWriter {
-	return &responseWriter{
-		ResponseWriter: w,
-		statusCode:     http.StatusOK,
-		written:        false,
-	}
-}
-
-// LoggingMiddleware returns an HTTP middleware that logs requests using the provided logger.
-func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
+// Logging returns middleware that logs each HTTP request with a request ID,
+// status, duration, and any attributes accumulated on the request context
+// via logctx.Set.
+func Logging(l *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := logctx.New(r.Context())
+			ctx := logger.NewLogCtx(r.Context())
+			reqID := r.Header.Get("X-Request-ID")
+			if reqID == "" {
+				reqID = nextRequestID()
+			}
+			w.Header().Set("X-Request-ID", reqID)
+			logger.Set(ctx, slog.String("request_id", reqID))
 			r = r.WithContext(ctx)
 
 			start := time.Now()
-
-			// Wrap the response writer to capture status code
-			rw := newResponseWriter(w)
-
-			// Call the next handler
-			next.ServeHTTP(rw, r)
-
-			// Calculate request duration
+			m := httpsnoop.CaptureMetrics(next, w, r)
 			duration := time.Since(start)
 
-			level, msg := generateLevelAndMessage(rw.statusCode)
-			logger.LogAttrs(ctx, level, msg,
+			level, msg := classify(m.Code)
+			l.LogAttrs(ctx, level, msg,
 				slog.String("method", r.Method),
 				slog.String("path", r.URL.Path),
-				slog.Int("status", rw.statusCode),
-				slog.Int64("duration_ms", duration.Milliseconds()),
-				// slog.String("remote_addr", r.Header.Get("X-Real-IP")),
-				// slog.String("user_agent", r.UserAgent()),
+				slog.Int("status", m.Code),
+				slog.Duration("duration", duration),
+				slog.Int64("bytes_written", m.Written),
 			)
 		})
 	}
 }
 
-func generateLevelAndMessage(statusCode int) (slog.Level, string) {
-	msg := "http request"
-	level := slog.LevelInfo
-
-	if statusCode >= 500 {
-		level = slog.LevelError
-	} else if statusCode >= 400 {
-		level = slog.LevelWarn
+func classify(statusCode int) (slog.Level, string) {
+	switch {
+	case statusCode >= 500:
+		return slog.LevelError, "http request error"
+	case statusCode >= 400:
+		return slog.LevelWarn, "http request client error"
+	default:
+		return slog.LevelInfo, "http request"
 	}
-
-	return level, msg
 }

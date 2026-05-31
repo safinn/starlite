@@ -1,11 +1,8 @@
 package layouts
 
-import (
-	"starlite/internal/config"
-	"starlite/internal/static"
-)
+import "starlite/internal/static"
 
-templ Base(title string, assetOptions ...AssetOptions) {
+templ Base(title string, isDev bool, assetOptions ...AssetOptions) {
 	<!DOCTYPE html>
 	<html
 		lang="en"
@@ -28,17 +25,17 @@ templ Base(title string, assetOptions ...AssetOptions) {
 					}
         }catch(e){}}();
       </script>
-			<link rel="icon" type="image/x-icon" href={ static.StaticPath("assets/favicon.ico") }/>
-			<link rel="stylesheet" href={ static.StaticPath("css/global.css") }/>
+			<link rel="icon" type="image/x-icon" href={ static.StaticPath("assets/favicon.ico", isDev) }/>
+			<link rel="stylesheet" href={ static.StaticPath("css/global.css", isDev) }/>
 			for _, cssFile := range buildAssetOptions(assetOptions...).CSS {
-				<link rel="stylesheet" href={ static.StaticPath(cssFile) }/>
+				<link rel="stylesheet" href={ static.StaticPath(cssFile, isDev) }/>
 			}
 			for _, jsFile := range buildAssetOptions(assetOptions...).JS {
-				<script type="module" src={ static.StaticPath(jsFile) }></script>
+				<script type="module" src={ static.StaticPath(jsFile, isDev) }></script>
 			}
 		</head>
 		<body>
-			if config.Global.Env == config.Dev {
+			if isDev {
 				<div data-init="@get('/reload', {retryMaxCount: 1000, retryInterval:20, retryMaxWaitMs:200})"></div>
 			}
 			{ children... }

@@ -1,21 +1,22 @@
 [settings]
 experimental = true
 
-[prepare.go]
+[deps.go]
 auto = true
 
 [tools]
-go = "1.26.1"
+go = "1.26.2"
 golangci-lint = "latest"
 sqlc = "latest"
 watchexec = "latest"
 caddy = "latest"
 uv = "latest"
 "pipx:sqlite-utils" = "latest"
+"aqua:a-h/templ" = "latest"
 
 [tasks.templ]
 description = "Generate templ files"
-run = "go tool templ generate"
+run = "templ generate"
 
 [tasks.sqlc]
 description = "Generate sqlc files"
@@ -48,7 +49,7 @@ interactive = true
 
 [tasks."live:templ"]
 description = "Watch and generate templ files"
-run = "go tool templ generate -watch -path internal -watch-pattern '(.+\\.templ$)' -ignore-pattern '(^|/)(db|data|tmp|bin)(/|$)'"
+run = "templ generate -watch -path internal -watch-pattern '(.+\\.templ$)' -ignore-pattern '(^|/)(db|data|tmp|bin)(/|$)'"
 
 [tasks."live:sqlc"]
 description = "Watch and generate sqlc files"
@@ -61,13 +62,13 @@ run = 'watchexec --postpone -w internal/static/files -e css,js,svg,png,jpg,jpeg,
 [tasks."live:server"]
 description = "Run air for live server reload"
 run = """
-go tool air -log.main_only=true \
-  -build.cmd "go build -o ./tmp/bin/main ./cmd/www" \
-  -build.entrypoint "./tmp/bin/main" \
-  -build.exclude_dir "assets,tmp,vendor,testdata,internal/db/zz" \
-  -build.exclude_regex "_test.go,_templ.go" \
-  -build.include_ext "go,tpl,tmpl,templ,html,sql" \
-  -misc.clean_on_exit "true"
+mkdir -p tmp
+watchexec --restart \
+  --exts go,templ,html,sql \
+  --ignore tmp/** --ignore '**/*_test.go' \
+  --debounce 300ms \
+  --shell=sh \
+  -- 'go build -o ./tmp/bin/main ./cmd/www && exec ./tmp/bin/main'
 """
 
 [tasks.dev]

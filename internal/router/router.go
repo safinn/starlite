@@ -21,20 +21,21 @@ import (
 // SetupRoutes registers all the application routes on the provided mux.
 func SetupRoutes(
 	ctx context.Context,
+	cfg config.Config,
 	mux *http.ServeMux,
 	sessionManager *scs.SessionManager,
 	sqliteDB *toolbeltdb.Database,
 	ns *embeddednats.Server,
 	log *slog.Logger,
 ) error {
-	if config.Global.Env == config.Dev {
+	if cfg.IsDev() {
 		setupReload(mux, log)
 	}
 
-	mux.Handle("GET /static/", static.Handler(log))
+	mux.Handle("GET /static/", static.Handler(log, cfg.IsDev()))
 
 	if err := errors.Join(
-		index.SetupRoutes(ctx, mux, sessionManager, log, sqliteDB, ns),
+		index.SetupRoutes(ctx, cfg, mux, sessionManager, log, sqliteDB, ns),
 	); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}

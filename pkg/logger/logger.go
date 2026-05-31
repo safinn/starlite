@@ -1,58 +1,55 @@
-// Package logger provides application-wide structured logging configuration.
 package logger
 
 import (
+	"io"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
-
-	"starlite/internal/config"
-	"starlite/pkg/logctx"
 
 	"github.com/lmittmann/tint"
 )
 
-var logLevel slog.LevelVar // zero value is Info
+type Logger struct {
+	*slog.Logger
+	level *slog.LevelVar
+}
 
-// New creates and returns a new slog logger based on the provided configuration.
-// In production, logs are formatted as JSON with Info level.
-// In all other environments, logs are formatted as text for better readability.
-func New() *slog.Logger {
-	var handler slog.Handler
-	SetLogLevel(getLogLevel(config.Global.LogLevel))
+func (l *Logger) SetLevel(s string) {
+	l.level.Set(parseLogLevel(s))
+}
 
-	if config.Global.Env == config.Prod {
-		// JSON format for production
-		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level: &logLevel,
+func New(w io.Writer, level string, format string) *Logger {
+	levelVar := new(slog.LevelVar)
+	levelVar.Set(parseLogLevel(level))
+
+	var base slog.Handler
+	switch format {
+	case "json":
+		base = slog.NewJSONHandler(w, &slog.HandlerOptions{
+			Level: levelVar,
 		})
-	} else {
-		// Text format for development
-		handler = tint.NewHandler(os.Stdout, &tint.Options{
-			Level:      &logLevel,
+	default:
+		base = tint.NewHandler(w, &tint.Options{
+			Level:      levelVar,
 			TimeFormat: time.Kitchen,
 		})
 	}
 
-	logger := slog.New(logctx.NewHandler(handler))
-
-	return logger
+	return &Logger{
+		Logger: slog.New(NewContextHandler(base)),
+		level:  levelVar,
+	}
 }
 
-func getLogLevel(levelStr string) slog.Level {
-	switch strings.ToLower(levelStr) {
+func parseLogLevel(s string) slog.Level {
+	switch strings.ToLower(s) {
 	case "debug":
 		return slog.LevelDebug
-	case "warn":
+	case "warn", "warning":
 		return slog.LevelWarn
 	case "error":
 		return slog.LevelError
 	default:
 		return slog.LevelInfo
 	}
-}
-
-func SetLogLevel(level slog.Level) {
-	logLevel.Set(level)
 }

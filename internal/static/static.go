@@ -8,8 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"starlite/internal/config"
-
 	"github.com/benbjohnson/hashfs"
 )
 
@@ -20,16 +18,10 @@ var (
 	filesSubFS, _  = fs.Sub(FilesDirectory, "files")
 	FilesSys       = hashfs.NewFS(filesSubFS)
 )
-
-type Config interface {
-	IsProduction() bool
-}
-
-func Handler(logger *slog.Logger) http.Handler {
+func Handler(logger *slog.Logger, isDev bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		isProduction := config.Global.Env == config.Prod
 		isFont := strings.HasPrefix(r.URL.Path, "/static/fonts/")
-		serveDirect := !isProduction || isFont
+		serveDirect := isDev || isFont
 
 		if serveDirect {
 			if isFont {
@@ -47,8 +39,8 @@ func Handler(logger *slog.Logger) http.Handler {
 	})
 }
 
-func StaticPath(path string) string {
-	if config.Global.Env == config.Prod {
+func StaticPath(path string, isDev bool) string {
+	if !isDev {
 		return "/static/" + FilesSys.HashName(path)
 	}
 	return "/static/" + path

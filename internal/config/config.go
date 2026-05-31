@@ -1,60 +1,68 @@
-// Package config provides application-wide configuration.
 package config
 
 import (
-	"fmt"
-	"os"
-	"sync"
-
-	"github.com/joho/godotenv"
+	"github.com/peterbourgon/ff/v4"
 )
 
-type Environment string
+type RunMode string
 
 const (
-	Dev  Environment = "dev"
-	Prod Environment = "prod"
+	RunModeServer  RunMode = "server"
+	RunModeAuto    RunMode = "auto"
+	RunModeMigrate RunMode = "migrate"
+	RunModeDown    RunMode = "down"
 )
 
-// Config holds the application configuration.
+func (c Config) IsDev() bool {
+	return c.Env == "dev"
+}
+
+func (c Config) IsProd() bool {
+	return c.Env == "prod"
+}
+
 type Config struct {
-	// Env is the environment the application is running in (e.g., "prod", "dev").
-	Env Environment
-	// ServerAddr is the address the HTTP server listens on.
-	ServerAddr string
-	// LogLevel is the logging level (e.g., "debug", "info", "warn", "error").
-	LogLevel string
+	Env         string
+	Port        int
+	Host        string
+	LogLevel    string
+	LogFormat   string
+	DatabaseURL string
+	RunMode     RunMode
+	configFile  string
 }
 
-var (
-	Global *Config
-	once   sync.Once
-)
+func Load(args []string) (Config, error) {
+	var cfg Config
 
-func init() {
-	once.Do(func() {
-		Global = Load()
-	})
-}
+	fs := ff.NewFlagSet("app")
+	fs.StringEnumVar(&cfg.Env, 'e', "env",
+		"environment: dev, stage/staging, prod",
+		"dev", "stage", "staging", "prod",
+	)
+	fs.IntVar(&cfg.Port, 'p', "port", 8080, "port")
+	fs.StringVar(&cfg.Host, 'h', "host", "", "host")
+	fs.StringEnumVar(&cfg.LogLevel, 'l', "log",
+		"log level: debug, info, warn/warning, error",
+		"info", "debug", "warn", "warning", "error",
+	)
+	fs.StringEnumVar(&cfg.LogFormat, 'f', "format",
+		"log format: text, json",
+		"text", "json",
+	)
+	fs.StringVar(&cfg.DatabaseURL, 'd', "db-url", "", "database connection URL")
+	fs.StringEnumVar((*string)(&cfg.RunMode), 'r', "run-mode",
+		"run mode: server, auto (migrate then serve), migrate (migrate only), down (rollback 1)",
+		"server", "auto", "migrate", "down",
+	)
+	fs.StringVar(&cfg.configFile, 'c', "config", "config", "config file name")
 
-// Load reads configuration from environment variables and returns a Config.
-// Defaults are provided for all values.
-func Load() *Config {
-	if err := godotenv.Load(".env.local"); err != nil {
-		fmt.Printf("No .env.local file found or error loading it: %v\n", err)
-	}
+	err := ff.Parse(fs, args,
+		ff.WithEnvVars(),
+		ff.WithConfigFileParser(ff.PlainParser),
+		ff.WithConfigFileFlag("config"),
+		ff.WithConfigAllowMissingFile(),
+	)
 
-	return &Config{
-		Env:        Environment(getEnv("ENV", string(Dev))),
-		ServerAddr: fmt.Sprintf(":%s", getEnv("PORT", "8080")),
-		LogLevel:   getEnv("LOG_LEVEL", "info"),
-	}
-}
-
-// getEnv retrieves an environment variable or returns a default value if not set.
-func getEnv(key, fallback string) string {
-	if val, ok := os.LookupEnv(key); ok {
-		return val
-	}
-	return fallback
+	return cfg, err
 }

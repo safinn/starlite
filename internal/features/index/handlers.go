@@ -6,10 +6,11 @@ import (
 	"log/slog"
 	"net/http"
 
+	"starlite/internal/config"
 	"starlite/internal/features/index/models"
 	"starlite/internal/features/index/pages"
 	"starlite/internal/features/index/services"
-	"starlite/pkg/logctx"
+	"starlite/pkg/logger"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/delaneyj/toolbelt/id"
@@ -20,13 +21,15 @@ type Handlers struct {
 	log              *slog.Logger
 	reactionsService *services.ReactionsService
 	sessionManager   *scs.SessionManager
+	cfg              config.Config
 }
 
-func NewHandlers(log *slog.Logger, rs *services.ReactionsService, sm *scs.SessionManager) *Handlers {
+func NewHandlers(log *slog.Logger, cfg config.Config, rs *services.ReactionsService, sm *scs.SessionManager) *Handlers {
 	return &Handlers{
 		log:              log,
 		reactionsService: rs,
 		sessionManager:   sm,
+		cfg:              cfg,
 	}
 }
 
@@ -37,7 +40,7 @@ func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := pages.Index(counts).Render(r.Context(), w); err != nil {
+	if err := pages.Index(h.cfg.IsDev(), counts).Render(r.Context(), w); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
@@ -82,7 +85,7 @@ func (h *Handlers) getUserIDFromSession(ctx context.Context) string {
 		h.sessionManager.Put(ctx, "userID", userID)
 	}
 
-	logctx.Set(ctx, slog.String("userID", userID))
+	logger.Set(ctx, slog.String("userID", userID))
 
 	return userID
 }

@@ -3,8 +3,6 @@ package middleware
 import (
 	"net/http"
 	"strings"
-
-	"starlite/internal/config"
 )
 
 const defaultPermissionsPolicy = "accelerometer=(), autoplay=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
@@ -23,28 +21,30 @@ const baseCSP = "default-src 'self'; " +
 const devScriptSrcElem = "script-src-elem 'self' https://cdn.jsdelivr.net 'unsafe-inline'"
 
 // SecurityHeadersMiddleware sets common security headers on each response.
-func SecurityHeadersMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h := w.Header()
+func SecurityHeadersMiddleware(isDev bool) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			h := w.Header()
 
-		setIfMissing(h, "X-Content-Type-Options", "nosniff")
-		setIfMissing(h, "X-Frame-Options", "DENY")
-		setIfMissing(h, "Referrer-Policy", "strict-origin-when-cross-origin")
-		setIfMissing(h, "Permissions-Policy", defaultPermissionsPolicy)
-		setIfMissing(h, "X-DNS-Prefetch-Control", "off")
-		setIfMissing(h, "X-Permitted-Cross-Domain-Policies", "none")
-		setIfMissing(h, "Content-Security-Policy", cspValue())
+			setIfMissing(h, "X-Content-Type-Options", "nosniff")
+			setIfMissing(h, "X-Frame-Options", "DENY")
+			setIfMissing(h, "Referrer-Policy", "strict-origin-when-cross-origin")
+			setIfMissing(h, "Permissions-Policy", defaultPermissionsPolicy)
+			setIfMissing(h, "X-DNS-Prefetch-Control", "off")
+			setIfMissing(h, "X-Permitted-Cross-Domain-Policies", "none")
+			setIfMissing(h, "Content-Security-Policy", cspValue(isDev))
 
-		if isSecureRequest(r) {
-			setIfMissing(h, "Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
-		}
+			if isSecureRequest(r) {
+				setIfMissing(h, "Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
+			}
 
-		next.ServeHTTP(w, r)
-	})
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
-func cspValue() string {
-	if config.Global.Env != config.Prod {
+func cspValue(isDev bool) string {
+	if isDev {
 		return baseCSP + "; " + devScriptSrcElem
 	}
 

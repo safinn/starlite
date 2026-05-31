@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+
 	"starlite/internal/db/zz"
 	"starlite/internal/features/index/models"
 
 	toolbeltdb "github.com/delaneyj/toolbelt/db"
-	"github.com/delaneyj/toolbelt/embeddednats"
 	"github.com/nats-io/nats.go"
 	"github.com/starfederation/datastar-go/datastar"
 	"zombiezen.com/go/sqlite"
@@ -21,17 +21,12 @@ type ReactionsService struct {
 	nc  *nats.Conn
 }
 
-func NewReactionsService(log *slog.Logger, db *toolbeltdb.Database, ns *embeddednats.Server) (*ReactionsService, error) {
-	nc, err := ns.Client()
-	if err != nil {
-		return nil, fmt.Errorf("error creating nats client: %w", err)
-	}
-
+func NewReactionsService(log *slog.Logger, db *toolbeltdb.Database, nc *nats.Conn) *ReactionsService {
 	return &ReactionsService{
 		log: log,
 		db:  db,
 		nc:  nc,
-	}, nil
+	}
 }
 
 // Start begins listening for relevant NATS events and updates the reaction counts accordingly.
