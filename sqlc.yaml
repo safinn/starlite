@@ -12,3 +12,4 @@ sql:
     codegen:
       - out: ./internal/db/zz
         plugin: zz
+

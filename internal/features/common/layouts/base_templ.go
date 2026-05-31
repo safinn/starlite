@@ -31,14 +31,14 @@ func Base(title string, isDev bool, assetOptions ...AssetOptions) templ.Componen
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" data-signals=\"{ theme: localStorage.getItem('theme') || 'system' }\" data-attr:class=\"$theme !== 'system' ? $theme : ''\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" data-signals=\"{ theme: localStorage.getItem('theme') || 'system' }\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 15, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 14, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -51,7 +51,7 @@ func Base(title string, isDev bool, assetOptions ...AssetOptions) templ.Componen
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(static.StaticPath("assets/favicon.ico", isDev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 28, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 27, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -64,7 +64,7 @@ func Base(title string, isDev bool, assetOptions ...AssetOptions) templ.Componen
 		var templ_7745c5c3_Var4 templ.SafeURL
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(static.StaticPath("css/global.css", isDev))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 29, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 28, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -82,7 +82,7 @@ func Base(title string, isDev bool, assetOptions ...AssetOptions) templ.Componen
 			var templ_7745c5c3_Var5 templ.SafeURL
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(static.StaticPath(cssFile, isDev))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 31, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 30, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -101,7 +101,7 @@ func Base(title string, isDev bool, assetOptions ...AssetOptions) templ.Componen
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(static.StaticPath(jsFile, isDev))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 34, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `features/common/layouts/base.templ`, Line: 33, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {

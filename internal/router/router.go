@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"starlite/internal/config"
-	"starlite/internal/features/index"
+	"starlite/internal/features/reactions"
 	"starlite/internal/static"
 
 	"github.com/alexedwards/scs/v2"
@@ -35,7 +35,7 @@ func SetupRoutes(
 	mux.Handle("GET /static/", static.Handler(log, cfg.IsDev()))
 
 	if err := errors.Join(
-		index.SetupRoutes(ctx, cfg, mux, sessionManager, log, sqliteDB, ns),
+		reactions.SetupRoutes(ctx, cfg.IsDev(), mux, sessionManager, log, sqliteDB, ns),
 	); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}

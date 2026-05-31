@@ -1,4 +1,4 @@
-package index
+package reactions
 
 import (
 	"context"
@@ -6,10 +6,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"starlite/internal/config"
-	"starlite/internal/features/index/models"
-	"starlite/internal/features/index/pages"
-	"starlite/internal/features/index/services"
+	"starlite/internal/features/reactions/models"
+	"starlite/internal/features/reactions/pages"
+	"starlite/internal/features/reactions/stream"
 	"starlite/pkg/logger"
 
 	"github.com/alexedwards/scs/v2"
@@ -18,29 +17,29 @@ import (
 )
 
 type Handlers struct {
-	log              *slog.Logger
-	reactionsService *services.ReactionsService
-	sessionManager   *scs.SessionManager
-	cfg              config.Config
+	log            *slog.Logger
+	reactionStream *stream.ReactionStream
+	sessionManager *scs.SessionManager
+	isDev          bool
 }
 
-func NewHandlers(log *slog.Logger, cfg config.Config, rs *services.ReactionsService, sm *scs.SessionManager) *Handlers {
+func NewHandlers(log *slog.Logger, isDev bool, rs *stream.ReactionStream, sm *scs.SessionManager) *Handlers {
 	return &Handlers{
-		log:              log,
-		reactionsService: rs,
-		sessionManager:   sm,
-		cfg:              cfg,
+		log:            log,
+		reactionStream: rs,
+		sessionManager: sm,
+		isDev:          isDev,
 	}
 }
 
 func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
-	counts, err := h.reactionsService.GetReactions(r.Context())
+	counts, err := h.reactionStream.Snapshot(r.Context())
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	if err := pages.Index(h.cfg.IsDev(), counts).Render(r.Context(), w); err != nil {
+	if err := pages.Index(h.isDev, counts).Render(r.Context(), w); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }
@@ -59,7 +58,7 @@ func (h *Handlers) HandleReaction(w http.ResponseWriter, r *http.Request) {
 
 	userID := h.getUserIDFromSession(r.Context())
 
-	err := h.reactionsService.AddReaction(r.Context(), userID, req.Reaction)
+	err := h.reactionStream.Add(r.Context(), userID, req.Reaction)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -71,9 +70,12 @@ func (h *Handlers) HandleReaction(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) ReactionsSSE(w http.ResponseWriter, r *http.Request) {
 	sse := datastar.NewSSE(w, r)
 
-	if err := h.reactionsService.HandleReactionSSE(r.Context(), sse); err != nil {
+	if err := h.reactionStream.Subscribe(r.Context(), func(counts map[string]int) {
+		if err := sse.MarshalAndPatchSignals(counts); err != nil {
+			h.log.Error("error marshaling and patching SSE signals", "error", err)
+		}
+	}); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
 	}
 }
 

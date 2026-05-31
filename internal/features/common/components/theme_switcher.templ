@@ -12,6 +12,7 @@ templ ThemeSwitcher() {
 			data-on:click="
         $theme = $themes[($themes.indexOf($theme) + 1) % $themes.length];
         localStorage.setItem('theme', $theme);
+        document.documentElement.className = $theme === 'system' ? '' : $theme;
       "
 			data-text="$theme"
 			class="theme-button"

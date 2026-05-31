@@ -1,4 +1,4 @@
-package index
+package reactions
 
 import (
 	"context"
@@ -6,8 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"starlite/internal/config"
-	"starlite/internal/features/index/services"
+	"starlite/internal/features/reactions/stream"
 
 	"github.com/alexedwards/scs/v2"
 	toolbeltdb "github.com/delaneyj/toolbelt/db"
@@ -16,7 +15,7 @@ import (
 
 func SetupRoutes(
 	ctx context.Context,
-	cfg config.Config,
+	isDev bool,
 	mux *http.ServeMux,
 	sessionManager *scs.SessionManager,
 	log *slog.Logger,
@@ -27,14 +26,13 @@ func SetupRoutes(
 	if err != nil {
 		return fmt.Errorf("error creating nats client: %w", err)
 	}
-	reactionsService := services.NewReactionsService(log, db, nc)
 
-	err = reactionsService.Start(ctx)
+	reactionStream, err := stream.New(ctx, log, db, nc)
 	if err != nil {
 		return err
 	}
 
-	handlers := NewHandlers(log, cfg, reactionsService, sessionManager)
+	handlers := NewHandlers(log, isDev, reactionStream, sessionManager)
 
 	mux.HandleFunc("GET /", handlers.IndexPage)
 	mux.HandleFunc("POST /react", handlers.HandleReaction)
