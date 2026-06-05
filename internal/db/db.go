@@ -24,6 +24,9 @@ func SetupDB(ctx context.Context, dataFolder string, shouldClear bool) (*toolbel
 	if err != nil {
 		return nil, fmt.Errorf("failed to read migrations directory: %w", err)
 	}
+	migrationsFiles = slices.DeleteFunc(migrationsFiles, func(de fs.DirEntry) bool {
+		return !de.IsDir() && strings.HasSuffix(de.Name(), ".down.sql")
+	})
 	slices.SortFunc(migrationsFiles, func(a, b fs.DirEntry) int {
 		return strings.Compare(a.Name(), b.Name())
 	})

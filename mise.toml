@@ -13,6 +13,7 @@ caddy = "latest"
 uv = "latest"
 "pipx:sqlite-utils" = "latest"
 "aqua:a-h/templ" = "latest"
+gomigrate = "latest"
 
 [tasks.templ]
 description = "Generate templ files"
@@ -79,3 +80,13 @@ depends = ["live:*"]
 description = "Build and deploy to server"
 depends = ["build:amd64"]
 run = "_tools/deploy.sh starlite"
+
+[tasks.migration-down]
+description = "Rollback the last migration"
+env = { RUN_MODE = "down" }
+run = "go run ./cmd/server"
+
+[tasks."migration:create"]
+description = "Create a new migration file"
+usage = 'arg "<name>"'
+run = "migrate create -ext sql -dir internal/db/migrations {{usage.name}}"
