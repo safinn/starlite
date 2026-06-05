@@ -11,14 +11,14 @@ const baseCSP = "default-src 'self'; " +
 	"base-uri 'self'; " +
 	"object-src 'none'; " +
 	"frame-ancestors 'none'; " +
-	"script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net; " +
+	"script-src 'self' 'unsafe-eval'; " +
 	"style-src 'self' 'unsafe-inline'; " +
 	"img-src 'self' data: blob:; " +
 	"font-src 'self' data:; " +
-	"connect-src 'self' https://cdn.jsdelivr.net;" +
+	"connect-src 'self';" +
 	"manifest-src 'self'"
 
-const devScriptSrcElem = "script-src-elem 'self' https://cdn.jsdelivr.net 'unsafe-inline'"
+const devScriptSrcElem = "script-src-elem 'self' 'unsafe-inline'"
 
 // SecurityHeadersMiddleware sets common security headers on each response.
 func SecurityHeadersMiddleware(isDev bool) func(http.Handler) http.Handler {
