@@ -12,13 +12,12 @@ const baseCSP = "default-src 'self'; " +
 	"object-src 'none'; " +
 	"frame-ancestors 'none'; " +
 	"script-src 'self' 'unsafe-eval'; " +
+	"script-src-elem 'self' 'unsafe-inline'; " +
 	"style-src 'self' 'unsafe-inline'; " +
 	"img-src 'self' data: blob:; " +
 	"font-src 'self' data:; " +
 	"connect-src 'self';" +
 	"manifest-src 'self'"
-
-const devScriptSrcElem = "script-src-elem 'self' 'unsafe-inline'"
 
 // SecurityHeadersMiddleware sets common security headers on each response.
 func SecurityHeadersMiddleware(isDev bool) func(http.Handler) http.Handler {
@@ -32,7 +31,7 @@ func SecurityHeadersMiddleware(isDev bool) func(http.Handler) http.Handler {
 			setIfMissing(h, "Permissions-Policy", defaultPermissionsPolicy)
 			setIfMissing(h, "X-DNS-Prefetch-Control", "off")
 			setIfMissing(h, "X-Permitted-Cross-Domain-Policies", "none")
-			setIfMissing(h, "Content-Security-Policy", cspValue(isDev))
+			setIfMissing(h, "Content-Security-Policy", baseCSP)
 
 			if isSecureRequest(r) {
 				setIfMissing(h, "Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
@@ -41,14 +40,6 @@ func SecurityHeadersMiddleware(isDev bool) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-func cspValue(isDev bool) string {
-	if isDev {
-		return baseCSP + "; " + devScriptSrcElem
-	}
-
-	return baseCSP
 }
 
 func setIfMissing(h http.Header, key, value string) {

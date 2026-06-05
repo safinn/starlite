@@ -22,14 +22,14 @@ func (c Config) IsProd() bool {
 }
 
 type Config struct {
-	Env         string
-	Port        int
-	Host        string
-	LogLevel    string
-	LogFormat   string
-	DatabaseURL string
-	RunMode     RunMode
-	configFile  string
+	Env        string
+	Port       int
+	Host       string
+	LogLevel   string
+	LogFormat  string
+	DataPath   string
+	RunMode    RunMode
+	configFile string
 }
 
 func Load(args []string) (Config, error) {
@@ -50,7 +50,7 @@ func Load(args []string) (Config, error) {
 		"log format: text, json",
 		"text", "json",
 	)
-	fs.StringVar(&cfg.DatabaseURL, 'd', "db-url", "", "database connection URL")
+	fs.StringVar(&cfg.DataPath, 'd', "data-path", "./", "data path")
 	fs.StringEnumVar((*string)(&cfg.RunMode), 'r', "run-mode",
 		"run mode: server, auto (migrate then serve), migrate (migrate only), down (rollback 1)",
 		"server", "auto", "migrate", "down",

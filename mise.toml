@@ -13,6 +13,7 @@ caddy = "latest"
 uv = "latest"
 "pipx:sqlite-utils" = "latest"
 "aqua:a-h/templ" = "latest"
+ko = "latest"
 
 [tasks.templ]
 description = "Generate templ files"
@@ -41,6 +42,10 @@ go build -gcflags="all=-N -l" -o bin/starlite ./cmd/www
 [tasks.build]
 description = "Build all binaries"
 depends = ["build:amd64", "build:local"]
+
+[tasks."build:image"]
+description = "Build a docker image and loads into local docker daemon"
+run = "ko build ./cmd/www"
 
 [tasks.debug]
 depends = ["build:local"]

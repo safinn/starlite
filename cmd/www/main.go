@@ -43,12 +43,12 @@ func run() error {
 	l := logger.New(os.Stderr, cfg.LogLevel, cfg.LogFormat)
 	ctx := context.Background()
 
-	db, err := db.SetupDB(ctx, l.Logger, "./", cfg.IsDev())
+	db, err := db.SetupDB(ctx, l.Logger, cfg.DataPath, cfg.IsDev())
 	if err != nil {
 		return fmt.Errorf("error setting up database: %w", err)
 	}
 
-	ns, err := nats.SetupNATS(ctx, l.Logger)
+	ns, err := nats.SetupNATS(ctx, l.Logger, cfg.DataPath)
 	if err != nil {
 		return err
 	}

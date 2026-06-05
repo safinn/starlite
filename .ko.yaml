@@ -1,0 +1,10 @@
+defaultPlatforms:
+  - linux/arm64
+
+builds:
+  - id: www
+    main: ./cmd/www/
+    ldflags:
+      - -s -w
+      - -extldflags "-static"
+      - -X main.commit={{.Git.ShortCommit}}

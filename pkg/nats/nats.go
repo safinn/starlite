@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net"
 	"os"
+	"path"
 	"strconv"
 
 	"github.com/delaneyj/toolbelt"
@@ -13,17 +14,19 @@ import (
 	natsserver "github.com/nats-io/nats-server/v2/server"
 )
 
-func SetupNATS(ctx context.Context, log *slog.Logger) (*embeddednats.Server, error) {
+func SetupNATS(ctx context.Context, log *slog.Logger, dataFolder string) (*embeddednats.Server, error) {
 	natsPort, err := getFreeNatsPort()
 	if err != nil {
 		return nil, fmt.Errorf("error obtaining NATS port: %w", err)
 	}
 
+	storeDir := path.Join(dataFolder, "nats")
+
 	ns, err := embeddednats.New(ctx, embeddednats.WithNATSServerOptions(&natsserver.Options{
 		JetStream: true,
 		NoSigs:    true,
 		Port:      natsPort,
-		StoreDir:  "data/nats",
+		StoreDir:  storeDir,
 	}))
 
 	if err != nil {
