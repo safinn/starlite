@@ -43,7 +43,7 @@ func run() error {
 	l := logger.New(os.Stderr, cfg.LogLevel, cfg.LogFormat)
 	ctx := context.Background()
 
-	db, err := db.SetupDB(ctx, "./", cfg.IsDev())
+	db, err := db.SetupDB(ctx, l.Logger, "./", cfg.IsDev())
 	if err != nil {
 		return fmt.Errorf("error setting up database: %w", err)
 	}

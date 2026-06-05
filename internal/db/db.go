@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
@@ -18,7 +18,7 @@ import (
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 
-func SetupDB(ctx context.Context, dataFolder string, shouldClear bool) (*toolbeltdb.Database, error) {
+func SetupDB(ctx context.Context, log *slog.Logger, dataFolder string, shouldClear bool) (*toolbeltdb.Database, error) {
 	migrationsDir := "migrations"
 	migrationsFiles, err := migrationsFS.ReadDir(migrationsDir)
 	if err != nil {
@@ -51,7 +51,7 @@ func SetupDB(ctx context.Context, dataFolder string, shouldClear bool) (*toolbel
 
 	dbFolder := filepath.Join(dataFolder, "data/sqlite")
 	if shouldClear {
-		log.Printf("Clearing database folder: %s", dbFolder)
+		log.InfoContext(ctx, "clearing database folder", "dbfolder", dbFolder)
 		if err := os.RemoveAll(dbFolder); err != nil {
 			return nil, fmt.Errorf("failed to remove database folder: %w", err)
 		}
