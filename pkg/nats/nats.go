@@ -25,6 +25,9 @@ func SetupNATS(ctx context.Context, log *slog.Logger, dataFolder string) (*embed
 	ns, err := embeddednats.New(ctx, embeddednats.WithNATSServerOptions(&natsserver.Options{
 		JetStream: true,
 		NoSigs:    true,
+		// Bind to loopback only: this server is for in-process JetStream
+		// pub/sub, never external clients.
+		Host:     "127.0.0.1",
 		Port:      natsPort,
 		StoreDir:  storeDir,
 	}))
