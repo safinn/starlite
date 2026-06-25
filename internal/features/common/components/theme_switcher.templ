@@ -7,15 +7,16 @@ templ ThemeSwitcher() {
       themes: ['light', 'dark', 'system']
     }"
 	>
-		<label>Theme</label>
 		<button
 			data-on:click="
         $theme = $themes[($themes.indexOf($theme) + 1) % $themes.length];
         localStorage.setItem('theme', $theme);
         document.documentElement.className = $theme === 'system' ? '' : $theme;
       "
-			data-text="$theme"
 			class="theme-button"
-		></button>
+			aria-label="Switch theme"
+		>
+			<span class="icon theme-icon"></span>
+		</button>
 	</div>
 }

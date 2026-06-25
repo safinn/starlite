@@ -1,66 +1,57 @@
 body {
-  padding: 0 var(--size-5);
   max-width: var(--width-md);
-  margin: var(--size-20) auto;
+  margin-block: var(--size-20);
+  margin-inline: auto;
+  padding-inline: var(--size-5);
 }
 
 header {
+  text-align: center;
+
   h1 {
+    margin-block: var(--size-2) var(--size-8);
     font-size: var(--size-7);
     font-weight: var(--weight-bold);
-    text-align: center;
-    margin: var(--size-2) 0 var(--size-8) 0;
     text-transform: uppercase;
   }
 
   p {
-    text-align: center;
-    margin-bottom: var(--size-4);
-  }
-
-  div {
-    text-align: center;
+    margin-block-end: var(--size-4);
   }
 }
-
-.theme-switcher {
-  label {
-    color: var(--muted-foreground);
-  }
-
-  .theme-button {
-    padding: var(--size-2) var(--size-3);
-    width: var(--size-20);
-    cursor: pointer;
-    text-transform: capitalize;
-  }
-}
-
-
 
 main {
-  margin: var(--size-16) 0;
+  margin-block: var(--size-16);
+}
 
-  section {
-    .reaction-container{
-      display: flex;
-      justify-content: center;
-      gap: var(--size-10);
+.reaction-container {
+  display: flex;
+  justify-content: center;
+  gap: var(--size-10);
 
-      .reaction-block {
-        font-size: var(--size-6);
+  .reaction-block {
+    font-size: var(--size-6);
 
-        .reaction-type {
-          font-size: var(--size-6);
-          padding: var(--size-2) var(--size-3);
-          cursor: pointer;
-          margin-right: var(--size-2);
-        }
+    .reaction-type {
+      padding-block: var(--size-2);
+      padding-inline: var(--size-3);
+      margin-inline-end: var(--size-2);
+      cursor: pointer;
+      border-radius: var(--radius-xs);
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      color: var(--muted-foreground);
+      transition: background-color 0.1s var(--ease-out-quad),
+        color 0.1s var(--ease-out-quad);
 
-        .reaction-count {
-          font-variant-numeric: tabular-nums;
-        }
+      &:hover {
+        background-color: var(--accent);
+        color: var(--accent-foreground);
       }
+    }
+
+    .reaction-count {
+      font-variant-numeric: tabular-nums;
     }
   }
 }

@@ -1,9 +1,34 @@
 :root {
-  --background: var(--color-mist-100);
-  --foreground: var(--color-mist-900);
-  --muted: var(--color-mist-300);
-  --muted-foreground: var(--color-mist-700);
-  --border: var(--color-mist-300);
+  --background: var(--color-zinc-100);
+  --foreground: var(--color-zinc-900);
+  --muted: var(--color-zinc-300);
+  --muted-foreground: var(--color-zinc-700);
+  --border: var(--color-zinc-300);
+  /* unavailable option chips: lighter than --muted-foreground so the label
+     reads as clearly muted, not just-as-dark-as-available. zinc-600 sits at
+     ~7:1 on the chip (matching the dark-mode treatment) — the lightest step
+     that still clears the 4.5:1 AA floor; zinc-500 drops to ~4.4:1. */
+  --unavailable-foreground: var(--color-zinc-600);
+  --surface: var(--color-zinc-50);
+  --surface-foreground: var(--color-zinc-900);
+  /* sky-700, not sky-600: 600 fails WCAG AA in light mode both as link
+     text on the page background (3.65:1) and under --primary-foreground on
+     the buy button (3.77:1). 700 clears 4.5:1 on both (5.32 / 5.49). */
+  --primary: var(--color-sky-700);
+  --primary-foreground: var(--color-sky-50);
+  /* selected-state fill: primary's quiet sibling, so selection doesn't
+     compete with primary action buttons */
+  --primary-muted: var(--color-sky-100);
+  --primary-muted-foreground: var(--color-sky-900);
+  --accent: var(--color-zinc-200);
+  --accent-foreground: var(--color-zinc-900);
+  --ring: var(--color-sky-500);
+  --destructive: var(--color-red-600);
+  --destructive-foreground: var(--color-red-50);
+  --success: var(--color-emerald-600);
+  --success-foreground: var(--color-emerald-50);
+  --warning: var(--color-amber-500);
+  --warning-foreground: var(--color-amber-950);
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -12,6 +37,9 @@
 
   /* icons */
   --rocket: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Sargam Icons by Abhimanyu Rana - https://github.com/planetabhi/sargam-icons/blob/main/LICENSE.txt --%3E%3Cg fill='none'%3E%3Cpath fill='currentColor' fill-opacity='.16' d='M9.198 6.59c0-2.336 1.563-4.549 2.805-4.59c1.242.041 2.802 2.254 2.802 4.59v1.148c0 2.54 3.346 4.221 4.187 5.328c.378.475.372 1.913.401 2.541a.38.38 0 0 1-.39.393h-3.906l-.684.819a.4.4 0 0 1-.337.181H9.927a.4.4 0 0 1-.337-.181L8.906 16H5a.38.38 0 0 1-.39-.393c.029-.628.023-2.066.4-2.541c.842-1.107 4.188-2.787 4.188-5.328z'/%3E%3Cpath stroke='currentColor' stroke-linejoin='round' stroke-miterlimit='10' stroke-width='1.5' d='M12 22s1-1.425 1-2.137c0-.713-.533-.863-1-.863s-1 .15-1 .863C11 20.575 12 22 12 22ZM9.198 6.59c0-2.336 1.563-4.549 2.805-4.59c1.242.041 2.802 2.254 2.802 4.59v1.148c0 2.54 3.346 4.221 4.187 5.328c.378.475.372 1.913.401 2.541a.38.38 0 0 1-.39.393h-3.906l-.684.819a.4.4 0 0 1-.337.181H9.927a.4.4 0 0 1-.337-.181L8.906 16H5a.38.38 0 0 1-.39-.393c.029-.628.023-2.066.4-2.541c.842-1.107 4.188-2.787 4.188-5.328z'/%3E%3C/g%3E%3C/svg%3E");
+  --icon-sun: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Sargam Icons by Abhimanyu Rana - https://github.com/planetabhi/sargam-icons/blob/main/LICENSE.txt --%3E%3Cg fill='none'%3E%3Cg clip-path='url(%23SVGHcSWxdhd)'%3E%3Cpath stroke='currentColor' stroke-linecap='round' stroke-miterlimit='10' stroke-width='1.5' d='M3 12H1m22 0h-2m-9 9v2m0-22v2M5.636 18.364l-1.414 1.414M19.778 4.222l-1.414 1.414m-12.728 0L4.222 4.222m15.556 15.556l-1.414-1.414M18 12a6 6 0 1 1-12 0a6 6 0 0 1 12 0Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='SVGHcSWxdhd'%3E%3Cpath fill='%23fff' d='M0 0h24v24H0z'/%3E%3C/clipPath%3E%3C/defs%3E%3C/g%3E%3C/svg%3E");
+  --icon-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Sargam Icons by Abhimanyu Rana - https://github.com/planetabhi/sargam-icons/blob/main/LICENSE.txt --%3E%3Cg fill='none'%3E%3Cpath fill='currentColor' fill-opacity='.16' d='M10.41 13.28C7.332 10.205 6.716 5.693 8.357 2c-1.23.41-2.256 1.23-3.281 2.256a10.4 10.4 0 0 0 0 14.768c4.102 4.102 10.46 3.897 14.562-.205c1.026-1.026 1.846-2.051 2.256-3.282c-3.896 1.436-8.409.82-11.486-2.256'/%3E%3Cpath stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M10.41 13.28C7.332 10.205 6.716 5.693 8.357 2c-1.23.41-2.256 1.23-3.281 2.256a10.4 10.4 0 0 0 0 14.768c4.102 4.102 10.46 3.897 14.562-.205c1.026-1.026 1.846-2.051 2.256-3.282c-3.896 1.436-8.409.82-11.486-2.256'/%3E%3C/g%3E%3C/svg%3E");
+  --icon-monitor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Sargam Icons by Abhimanyu Rana - https://github.com/planetabhi/sargam-icons/blob/main/LICENSE.txt --%3E%3Cg fill='none'%3E%3Cpath fill='currentColor' fill-opacity='.16' d='M19.6 4H4.4A2.4 2.4 0 0 0 2 6.4v8.2A2.4 2.4 0 0 0 4.4 17h15.2a2.4 2.4 0 0 0 2.4-2.4V6.4A2.4 2.4 0 0 0 19.6 4'/%3E%3Cpath stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' stroke-width='1.5' d='M9 20h6M4.4 4h15.2A2.4 2.4 0 0 1 22 6.4v8.2a2.4 2.4 0 0 1-2.4 2.4H4.4A2.4 2.4 0 0 1 2 14.6V6.4A2.4 2.4 0 0 1 4.4 4'/%3E%3C/g%3E%3C/svg%3E");
 
   --scale-0: 1rem;
   --scale-1: 1.125rem;
@@ -471,11 +499,28 @@ html.light {
 }
 
 html.dark {
-  --background: var(--color-mist-950);
-  --foreground: var(--color-mist-100);
-  --muted: var(--color-mist-700);
-  --muted-foreground: var(--color-mist-500);
-  --border: var(--color-mist-600);
+  --background: var(--color-zinc-900);
+  --foreground: var(--color-zinc-200);
+  --muted: var(--color-zinc-700);
+  --muted-foreground: var(--color-zinc-400);
+  --border: var(--color-zinc-700);
+  /* dark chips already read as muted at zinc-400, so keep the prior value */
+  --unavailable-foreground: var(--color-zinc-400);
+  --surface: var(--color-zinc-800);
+  --surface-foreground: var(--color-zinc-200);
+  --primary: var(--color-sky-400);
+  --primary-foreground: var(--color-sky-950);
+  --primary-muted: var(--color-sky-950);
+  --primary-muted-foreground: var(--color-sky-200);
+  --accent: var(--color-zinc-700);
+  --accent-foreground: var(--color-zinc-100);
+  --ring: var(--color-sky-400);
+  --destructive: var(--color-red-400);
+  --destructive-foreground: var(--color-red-950);
+  --success: var(--color-emerald-400);
+  --success-foreground: var(--color-emerald-950);
+  --warning: var(--color-amber-400);
+  --warning-foreground: var(--color-amber-950);
 
   color-scheme: dark;
 }
@@ -485,11 +530,28 @@ html.dark {
 
   html:not([class]),
   html[class=""] {
-    --background: var(--color-mist-950);
-    --foreground: var(--color-mist-100);
-    --muted: var(--color-mist-700);
-    --muted-foreground: var(--color-mist-500);
-    --border: var(--color-mist-600);
+    --background: var(--color-zinc-900);
+    --foreground: var(--color-zinc-200);
+    --muted: var(--color-zinc-700);
+    --muted-foreground: var(--color-zinc-400);
+    --border: var(--color-zinc-700);
+    /* dark chips already read as muted at zinc-400, so keep the prior value */
+    --unavailable-foreground: var(--color-zinc-400);
+    --surface: var(--color-zinc-800);
+    --surface-foreground: var(--color-zinc-200);
+    --primary: var(--color-sky-400);
+    --primary-foreground: var(--color-sky-950);
+    --primary-muted: var(--color-sky-950);
+    --primary-muted-foreground: var(--color-sky-200);
+    --accent: var(--color-zinc-700);
+    --accent-foreground: var(--color-zinc-100);
+    --ring: var(--color-sky-400);
+    --destructive: var(--color-red-400);
+    --destructive-foreground: var(--color-red-950);
+    --success: var(--color-emerald-400);
+    --success-foreground: var(--color-emerald-950);
+    --warning: var(--color-amber-400);
+    --warning-foreground: var(--color-amber-950);
 
     color-scheme: dark;
   }
@@ -593,6 +655,41 @@ body {
   height: var(--icon-size);
   background-color: currentColor;
   flex-shrink: 0;
+  /* optical baseline for icons sitting inline with text; ignored in flex */
+  vertical-align: -0.25em;
   mask: var(--icon) no-repeat center / 100% 100%;
   -webkit-mask: var(--icon) no-repeat center / 100% 100%;
+}
+
+.theme-switcher {
+  .theme-button {
+    display: inline-flex;
+    padding: var(--size-2);
+    cursor: pointer;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--muted-foreground);
+    transition: background-color 0.1s var(--ease-out-quad),
+      color 0.1s var(--ease-out-quad);
+
+    &:hover {
+      background-color: var(--accent);
+      color: var(--accent-foreground);
+    }
+  }
+
+  /* glyph follows the theme class on <html>; no class = system */
+  .theme-icon {
+    --icon-size: 1em;
+    --icon: var(--icon-monitor);
+  }
+
+  :root.light & .theme-icon {
+    --icon: var(--icon-sun);
+  }
+
+  :root.dark & .theme-icon {
+    --icon: var(--icon-moon);
+  }
 }

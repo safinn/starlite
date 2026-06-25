@@ -29,7 +29,7 @@ func ThemeSwitcher() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"theme-switcher\" data-signals=\"{\n      themes: ['light', 'dark', 'system']\n    }\"><label>Theme</label> <button data-on:click=\"\n        $theme = $themes[($themes.indexOf($theme) + 1) % $themes.length];\n        localStorage.setItem('theme', $theme);\n        document.documentElement.className = $theme === 'system' ? '' : $theme;\n      \" data-text=\"$theme\" class=\"theme-button\"></button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"theme-switcher\" data-signals=\"{\n      themes: ['light', 'dark', 'system']\n    }\"><button data-on:click=\"\n        $theme = $themes[($themes.indexOf($theme) + 1) % $themes.length];\n        localStorage.setItem('theme', $theme);\n        document.documentElement.className = $theme === 'system' ? '' : $theme;\n      \" class=\"theme-button\" aria-label=\"Switch theme\"><span class=\"icon theme-icon\"></span></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
