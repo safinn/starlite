@@ -33,6 +33,15 @@ func SecurityHeadersMiddleware(isDev bool) func(http.Handler) http.Handler {
 			setIfMissing(h, "X-Permitted-Cross-Domain-Policies", "none")
 			setIfMissing(h, "Content-Security-Policy", baseCSP)
 
+			// Default everything that doesn't opt into caching to revalidate.
+			// This catches HTML pages (which set no Cache-Control of their own),
+			// so a deploy's new fingerprinted asset URLs are always picked up and
+			// no intermediary serves stale markup pointing at asset hashes that no
+			// longer exist. Handlers that want real caching -- static assets, OG
+			// images, feeds, the sitemap -- Set their own Cache-Control, which
+			// overrides this default.
+			setIfMissing(h, "Cache-Control", "no-cache")
+
 			if isSecureRequest(r) {
 				setIfMissing(h, "Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload")
 			}
