@@ -2,7 +2,7 @@ package layouts
 
 import "starlite/internal/static"
 
-templ Base(title string, isDev bool, assetOptions ...AssetOptions) {
+templ Base(meta Meta, isDev bool, assetOptions ...AssetOptions) {
 	<!DOCTYPE html>
 	<html
 		lang="en"
@@ -11,8 +11,34 @@ templ Base(title string, isDev bool, assetOptions ...AssetOptions) {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>{ title }</title>
-			<meta name="description" content="Starting stack for go + datastar + templ + sqlite + sqlc project."/>
+			<title>{ brandedTitle(meta.Title) }</title>
+			if meta.Description != "" {
+				<meta name="description" content={ meta.Description }/>
+			}
+			if meta.NoIndex {
+				<meta name="robots" content="noindex"/>
+			}
+			if meta.Canonical != "" {
+				<link rel="canonical" href={ meta.Canonical }/>
+				<meta property="og:url" content={ meta.Canonical }/>
+			}
+			<meta property="og:type" content="website"/>
+			<meta property="og:site_name" content={ meta.Title }/>
+			<meta property="og:title" content={ brandedTitle(meta.Title) }/>
+			if meta.Description != "" {
+				<meta property="og:description" content={ meta.Description }/>
+			}
+			if img := ogImage(meta); img != "" {
+				<meta property="og:image" content={ img }/>
+				<meta property="og:image:type" content="image/png"/>
+				<meta property="og:image:width" content="1200"/>
+				<meta property="og:image:height" content="630"/>
+				<meta property="og:image:alt" content={ brandedTitle(meta.Title) }/>
+				<meta name="twitter:card" content="summary_large_image"/>
+				<meta name="twitter:image" content={ img }/>
+			} else {
+				<meta name="twitter:card" content="summary"/>
+			}
 			<script>
         !function(){try{
           var d=document.documentElement,
@@ -24,7 +50,25 @@ templ Base(title string, isDev bool, assetOptions ...AssetOptions) {
 					}
         }catch(e){}}();
       </script>
-			<link rel="icon" type="image/x-icon" href={ static.StaticPath("assets/favicon.ico", isDev) }/>
+			<script>
+        // Client hints: write one ch_-prefixed cookie per value the server can't
+        // infer (timezone today), so timestamps render in the visitor's own zone.
+        // No reload — the cookie is read on the next navigation; server falls back
+        // to UTC until then. Re-set only on change, so a traveller's new zone
+        // takes over without writing a cookie every load.
+        !function(){try{
+          var hints=[{c:"ch_tz",v:Intl.DateTimeFormat().resolvedOptions().timeZone}];
+          hints.forEach(function(h){
+            if(h.v && ("; "+document.cookie).indexOf("; "+h.c+"="+h.v)<0){
+              document.cookie=h.c+"="+h.v+";path=/;max-age=31536000;samesite=lax";
+            }
+          });
+        }catch(e){}}();
+      </script>
+			<link rel="icon" href={ static.StaticPath("assets/favicon.ico", isDev) } sizes="32x32"/>
+			<link rel="icon" type="image/svg+xml" href={ static.StaticPath("assets/icon-dark.svg", isDev) }/>
+			<link rel="apple-touch-icon" href={ static.StaticPath("assets/apple-touch-icon.png", isDev) }/>
+			<link rel="manifest" href={ static.StaticPath("assets/site.webmanifest", isDev) }/>
 			<link rel="stylesheet" href={ static.StaticPath("css/global.css", isDev) }/>
 			for _, cssFile := range buildAssetOptions(assetOptions...).CSS {
 				<link rel="stylesheet" href={ static.StaticPath(cssFile, isDev) }/>

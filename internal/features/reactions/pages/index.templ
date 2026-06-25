@@ -5,8 +5,12 @@ import (
 	"starlite/internal/features/common/layouts"
 )
 
-templ Index(isDev bool, counts map[string]int) {
-	@layouts.Base("Starlite", isDev, layouts.JS("js/datastar.js"), layouts.CSS("css/index.css")) {
+templ Index(isDev bool, baseURL string, counts map[string]int) {
+	@layouts.Base(layouts.Meta{
+		Title:       "Starlite",
+		Description: "Index page of the starlite template",
+		Canonical:   baseURL + "/",
+	}, isDev, layouts.JS("js/datastar.js"), layouts.CSS("css/index.css")) {
 		<header>
 			<div>
 				@components.Icon("rocket", "2em")

@@ -20,14 +20,16 @@ type Handlers struct {
 	log            *slog.Logger
 	reactionStream *stream.ReactionStream
 	sessionManager *scs.SessionManager
+	baseURL        string
 	isDev          bool
 }
 
-func NewHandlers(log *slog.Logger, isDev bool, rs *stream.ReactionStream, sm *scs.SessionManager) *Handlers {
+func NewHandlers(log *slog.Logger, isDev bool, baseURL string, rs *stream.ReactionStream, sm *scs.SessionManager) *Handlers {
 	return &Handlers{
 		log:            log,
 		reactionStream: rs,
 		sessionManager: sm,
+		baseURL:        baseURL,
 		isDev:          isDev,
 	}
 }
@@ -39,7 +41,7 @@ func (h *Handlers) IndexPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := pages.Index(h.isDev, counts).Render(r.Context(), w); err != nil {
+	if err := pages.Index(h.isDev, h.baseURL, counts).Render(r.Context(), w); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 }

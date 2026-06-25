@@ -10,11 +10,12 @@ import (
 
 	"starlite/internal/config"
 	"starlite/internal/features/reactions"
+	"starlite/internal/og"
 	"starlite/internal/static"
 
 	"github.com/alexedwards/scs/v2"
 	toolbeltdb "github.com/delaneyj/toolbelt/db"
-	"github.com/delaneyj/toolbelt/embeddednats"
+	"github.com/nats-io/nats.go"
 	"github.com/starfederation/datastar-go/datastar"
 )
 
@@ -25,7 +26,7 @@ func SetupRoutes(
 	mux *http.ServeMux,
 	sessionManager *scs.SessionManager,
 	sqliteDB *toolbeltdb.Database,
-	ns *embeddednats.Server,
+	nc *nats.Conn,
 	log *slog.Logger,
 ) error {
 	if cfg.IsDev() {
@@ -44,7 +45,8 @@ func SetupRoutes(
 	mux.Handle("GET /static/", static.Handler(log, cfg.IsDev()))
 
 	if err := errors.Join(
-		reactions.SetupRoutes(ctx, cfg.IsDev(), mux, sessionManager, log, sqliteDB, ns),
+		og.SetupRoutes(mux, log),
+		reactions.SetupRoutes(ctx, cfg, mux, sessionManager, log, sqliteDB, nc),
 	); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}

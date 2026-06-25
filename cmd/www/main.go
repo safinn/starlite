@@ -21,7 +21,7 @@ import (
 	"starlite/pkg/nats"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/delaneyj/toolbelt/embeddednats"
+	natsgo "github.com/nats-io/nats.go"
 	"golang.org/x/sync/errgroup"
 
 	toolbeltdb "github.com/delaneyj/toolbelt/db"
@@ -53,11 +53,18 @@ func run() error {
 		return err
 	}
 
+	// Create the single NATS client here so a connection failure aborts boot,
+	// and features receive a ready *nats.Conn rather than the embedded server.
+	nc, err := ns.Client()
+	if err != nil {
+		return fmt.Errorf("error creating nats client: %w", err)
+	}
+
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	if err := serve(ctx, l.Logger, cfg, db, ns); err != nil &&
+	if err := serve(ctx, l.Logger, cfg, db, nc); err != nil &&
 		!errors.Is(err, http.ErrServerClosed) &&
 		!errors.Is(err, context.Canceled) {
 		l.ErrorContext(ctx, "server failed", "err", err)
@@ -66,7 +73,7 @@ func run() error {
 	return nil
 }
 
-func serve(ctx context.Context, log *slog.Logger, cfg config.Config, db *toolbeltdb.Database, ns *embeddednats.Server) error {
+func serve(ctx context.Context, log *slog.Logger, cfg config.Config, db *toolbeltdb.Database, nc *natsgo.Conn) error {
 	eg, egctx := errgroup.WithContext(ctx)
 	addr := net.JoinHostPort(cfg.Host, strconv.Itoa(cfg.Port))
 
@@ -77,7 +84,7 @@ func serve(ctx context.Context, log *slog.Logger, cfg config.Config, db *toolbel
 
 	mux := http.NewServeMux()
 
-	if err := router.SetupRoutes(egctx, cfg, mux, sessionManager, db, ns, log); err != nil {
+	if err := router.SetupRoutes(egctx, cfg, mux, sessionManager, db, nc, log); err != nil {
 		return fmt.Errorf("error setting up routes: %w", err)
 	}
 

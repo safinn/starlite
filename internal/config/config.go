@@ -29,6 +29,7 @@ type Config struct {
 	LogFormat  string
 	DataPath   string
 	RunMode    RunMode
+	BaseURL    string
 	configFile string
 }
 
@@ -40,6 +41,7 @@ func Load(args []string) (Config, error) {
 		"environment: dev, stage/staging, prod",
 		"dev", "stage", "staging", "prod",
 	)
+	fs.StringVar(&cfg.BaseURL, 0, "base-url", "http://localhost:8080", "public origin of this deployment, no trailing slash")
 	fs.IntVar(&cfg.Port, 'p', "port", 8080, "port")
 	fs.StringVar(&cfg.Host, 'h', "host", "", "host")
 	fs.StringEnumVar(&cfg.LogLevel, 'l', "log",
