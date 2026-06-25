@@ -32,6 +32,15 @@ func SetupRoutes(
 		setupReload(mux, log)
 	}
 
+	// /up is a cheap liveness probe: touches no DB, templates, or session, so the
+	// deploy health check and uptime monitors can hit it without rendering a page.
+	// A 200 means the binary booted and is serving.
+	mux.HandleFunc("GET /up", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte("OK")); err != nil {
+			log.Error("error writing /up response", "error", err)
+		}
+	})
+
 	mux.Handle("GET /static/", static.Handler(log, cfg.IsDev()))
 
 	if err := errors.Join(
