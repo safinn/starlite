@@ -9,7 +9,7 @@ Boilerplate for creating real-time Hypermedia applications in Go. Heavily inspir
 - [templ](https://templ.guide/) for powerful HTML templates
 - [Embedded nats](https://github.com/delaneyj/toolbelt/tree/main/embeddednats) as an event bus
 - [Mise](https://mise.jdx.dev/) for tool management and task runner
-- Hot reloading in development using [Air](https://github.com/air-verse/air) and [watchexec](https://github.com/watchexec/watchexec)
+- Hot reloading in development using [watchexec](https://github.com/watchexec/watchexec)
 - [hashfs](https://github.com/benbjohnson/hashfs) for aggressive HTTP caching of static files
 
 ## Getting started
