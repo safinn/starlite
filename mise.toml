@@ -65,7 +65,7 @@ description = "Watch static files and trigger hot reload"
 run = 'watchexec --postpone -w internal/static/files -e css,js,svg,png,jpg,jpeg,gif,webp,ico,md -- curl -s http://localhost:8080/hotreload || true'
 
 [tasks."live:server"]
-description = "Run air for live server reload"
+description = "Run watchexec for live server reload"
 run = """
 mkdir -p tmp
 watchexec --restart \
