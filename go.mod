@@ -1,6 +1,6 @@
 module starlite
 
-go 1.26.2
+go 1.26.4
 
 tool (
 	github.com/delaneyj/toolbelt/sqlc-gen-zombiezen

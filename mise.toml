@@ -5,7 +5,7 @@ experimental = true
 auto = true
 
 [tools]
-go = "1.26.2"
+go = "1.26.4"
 golangci-lint = "latest"
 sqlc = "latest"
 watchexec = "latest"
@@ -15,12 +15,17 @@ uv = "latest"
 "aqua:a-h/templ" = "latest"
 ko = "latest"
 
+[tasks.tools]
+description = "Install go tools from go.mod"
+run = "go install tool"
+
 [tasks.templ]
 description = "Generate templ files"
 run = "templ generate -path internal"
 
 [tasks.sqlc]
 description = "Generate sqlc files"
+depends = ["tools"]
 run = "sqlc generate"
 
 [tasks."build:amd64"]
