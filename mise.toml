@@ -1,6 +1,9 @@
 [settings]
 experimental = true
 
+[vars]
+app = "hearth"
+
 [deps.go]
 auto = true
 
@@ -33,7 +36,7 @@ description = "Build linux/amd64 binary"
 depends = ["templ", "sqlc"]
 run = """
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-go build -ldflags="-s -w" -trimpath -o bin/starlite-amd64 ./cmd/www
+go build -ldflags="-s -w" -trimpath -o bin/{{vars.app}}-amd64 ./cmd/www
 """
 
 [tasks."build:local"]
@@ -41,7 +44,7 @@ description = "Build local and arm64 binary"
 depends = ["templ", "sqlc"]
 run = """
 CGO_ENABLED=0 \
-go build -gcflags="all=-N -l" -o bin/starlite ./cmd/www
+go build -gcflags="all=-N -l" -o bin/{{vars.app}} ./cmd/www
 """
 
 [tasks.build]
@@ -54,7 +57,7 @@ run = "ko build ./cmd/www"
 
 [tasks.debug]
 depends = ["build:local"]
-run = "go tool dlv exec ./bin/starlite"
+run = "go tool dlv exec ./bin/{{vars.app}}"
 interactive = true
 
 [tasks."live:templ"]
